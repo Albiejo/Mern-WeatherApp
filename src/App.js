@@ -8,12 +8,12 @@ function App() {
 
   const [data  , setData] = useState({})
   const [location , setLocation] = useState("")
-
-  const geoUrl =`https://api.openweathermap.org/geo/1.0/direct?q=${location}&limit=1&appid=48e23cf83075d48b0f5f4066c668383a`
+  const APIKEY = process.env.REACT_APP_API_KEY
+  const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${location}&limit=1&appid=${APIKEY}`;
 
 
   const searchLocation = (event) => {
-    if (event.key==='Enter') {
+    if (event.key === 'Enter') {
       axios.get(geoUrl).then((response) => {
         if (response.data.length > 0) {
           const { lat, lon } = response.data[0];
@@ -22,16 +22,15 @@ function App() {
           console.log("Location not found");
         }
       });
-    setLocation("")
+      setLocation("");
     }
-  }
+  };
 
 
   const getWeather = (lat, lon) => {
-    const weatherUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=48e23cf83075d48b0f5f4066c668383a`
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${APIKEY}`;
     axios.get(weatherUrl).then((response) => {
       setData(response.data);
-      console.log(response.data);
     });
   };
 
@@ -47,31 +46,34 @@ function App() {
         />
       </div>
      <div className="container">
-        <div className="top">
-          <div className="location">
-            <p>{data.name}</p>
+          <div className="top">
+            <div className="location">
+              <p>{data.name}</p>
+            </div>
+            <div className="temp">
+               {data.main?  <h1>{data.main.temp.toFixed()} °F</h1> : null }
+            </div>
+            <div className="description">
+              {data.weather ? <p>{data.weather[0].main}</p> : null}
+            </div>
           </div>
-          <div className="temp">
-              <h1>65° F</h1>
-          </div>
-          <div className="description">
-            <p>Clouds</p>
-          </div>
-        </div>
-        <div className="bottom">
-          <div className="feels">
-            <p className="bold">65° F</p>
-            <p>Feels Like</p>
-          </div>
-          <div className="humidity">
-          <p className="bold">20%</p>
-          <p>Humidity</p>
-          </div>
-          <div className="wind">
-              <p className="bold">12 MPH</p>
-              <p>Wind speed</p>
-          </div>
-        </div>
+          {data.name !==undefined &&
+           <div className="bottom">
+           <div className="feels">
+             {data.main ? <p className="bold">{data.main.feels_like.toFixed()} °F</p> : null }
+             <p>Feels Like</p>
+           </div>
+           <div className="humidity">
+          {data.main ? <p className="bold">{data.main.humidity} %</p> : null }
+           <p>Humidity</p>
+           </div>
+           <div className="wind">
+             {data.wind ? <p className="bold">{data.wind.speed.toFixed()} MPH</p> : null}
+               <p>Wind speed</p>
+           </div>
+         </div>
+          }
+       
      </div>
     </div>
   );
